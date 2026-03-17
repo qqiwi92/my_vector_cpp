@@ -8,9 +8,18 @@ namespace stuff {
   template < class T > struct Vector {
     ~Vector();
     Vector();
+    Vector(const Vector&);
+    Vector(Vector&&);
+    Vector& operator=(const Vector&);
+    Vector& operator=(Vector&&);
 
     bool isEmpty() const noexcept;
+    size_t getSize() const noexcept;
+    size_t getCapacity() const noexcept;
 
+    void pushBack(const T& v);
+    void popBack();
+    
   private:
     T* data_;
     size_t size_, capacity_;
@@ -29,5 +38,7 @@ template < class T > bool stuff::Vector< T >::isEmpty() const noexcept
 {
   return !size_;
 }
+
+template < class T > void stuff
 
 #endif
