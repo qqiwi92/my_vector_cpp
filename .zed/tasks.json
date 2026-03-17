@@ -1,0 +1,23 @@
+[
+  {
+    "label": "Build Project",
+    "command": "make",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+  },
+  {
+    "label": "Run Project",
+    "command": "./main",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+  },
+  {
+    "label": "Build & Run",
+    "command": "make && ./main",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+  },
+]
