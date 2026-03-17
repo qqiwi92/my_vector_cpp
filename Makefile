@@ -1,11 +1,4 @@
-CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++17
-TARGET = main
+CXXFLAGS += -Wall -Wextra -std=c++14
 
-all: $(TARGET)
-
-$(TARGET): main.cpp
-	$(CXX) $(CXXFLAGS) main.cpp -o $(TARGET)
-
-clean:
-	rm -f $(TARGET)
+main: main.o
+	$(CXX) $^ -o $@
