@@ -5,7 +5,11 @@
 #define ANSI_GREEN "\033[32m"
 #define ANSI_RESET "\033[0m"
 
-bool testEmptyVector() { return false; }
+bool testEmptyVector()
+{
+  stuff::Vector< int > v;
+  return v.isEmpty();
+}
 
 int main()
 {
