@@ -12,7 +12,7 @@ namespace stuff {
     Vector(Vector&&);
     Vector& operator=(const Vector&);
     Vector& operator=(Vector&&);
-    T& operator[](const Vector &);
+    T& operator[](size_t);
 
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
@@ -24,9 +24,8 @@ namespace stuff {
     void erase(size_t i);
     T& at(size_t index);
 
-
-        private : void
-                  expand();
+  private:
+    void expand();
     void expandIfFull();
     T* data_;
     size_t size_, capacity_;
@@ -78,6 +77,11 @@ template < class T > void stuff::Vector< T >::expandIfFull()
   if (size_ == capacity_) {
     expand();
   }
+}
+
+template < class T > T& stuff::Vector< T >::operator[](size_t i)
+{
+  return data_[i];
 }
 
 template < class T > void stuff::Vector< T >::pushBack(const T& val)

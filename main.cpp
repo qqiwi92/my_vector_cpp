@@ -46,6 +46,20 @@ bool testAt()
     return true;
   }
 }
+bool testBrackets()
+{
+  stuff::Vector< int > v;
+  v.pushBack(1);
+  ASSERT_TRUE(v[0] == 1);
+  v.pushBack(2);
+  ASSERT_TRUE(v[1] == 2);
+  v.pushBack(3);
+  ASSERT_TRUE(v[2] == 3);
+  v[2] = 4;
+  ASSERT_TRUE(v[2] == 4);
+
+  return true;
+}
 
 int main()
 {
@@ -53,7 +67,8 @@ int main()
   test_t tests[] = {
       {"Empty vector", testEmptyVector},
       {"Push test", testPushBack},
-      {"at() test", testPushBack}};
+      {"at() test", testPushBack},
+      {"Vec[i] test", testBrackets}};
 
   const size_t count = sizeof(tests) / sizeof(test_t);
 
