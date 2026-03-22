@@ -69,7 +69,11 @@ template < class T > void stuff::Vector< T >::expandIfFull()
   }
 }
 
-template < class T > void stuff::Vector< T >::pushBack(const T& val) {}
+template < class T > void stuff::Vector< T >::pushBack(const T& val)
+{
+  expandIfFull();
+  data_[size_++] = val;
+}
 
 template < class T > size_t stuff::Vector< T >::getSize() const noexcept
 {
