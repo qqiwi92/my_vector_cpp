@@ -24,6 +24,7 @@ namespace stuff {
 
   private:
     void expand();
+    void expandIfFull();
     T* data_;
     size_t size_, capacity_;
   };
@@ -61,6 +62,13 @@ template < class T > void stuff::Vector< T >::expand()
   }
 }
 
+template < class T > void stuff::Vector< T >::expandIfFull()
+{
+  if (size_ == capacity_) {
+    expand();
+  }
+}
+
 template < class T > void stuff::Vector< T >::pushBack(const T& val) {}
 
 template < class T > size_t stuff::Vector< T >::getSize() const noexcept
@@ -72,7 +80,5 @@ template < class T > size_t stuff::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
 }
-
-
 
 #endif
