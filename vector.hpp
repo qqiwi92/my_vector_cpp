@@ -1,5 +1,5 @@
-#ifndef VECTOR
-#define VECTOR
+#ifndef CUSTOM_VECTOR
+#define CUSTOM_VECTOR
 
 #include <cstddef>
 
@@ -19,7 +19,8 @@ namespace stuff {
 
     void pushBack(const T& v);
     void popBack();
-    
+    void insert(size_t i, const T & v);
+    void erase(size_t i);
   private:
     T* data_;
     size_t size_, capacity_;
@@ -39,6 +40,6 @@ template < class T > bool stuff::Vector< T >::isEmpty() const noexcept
   return !size_;
 }
 
-template < class T > void stuff
+// template < class T > bool stuff::Vector< T >::isEmpty() const noexcept
 
 #endif
