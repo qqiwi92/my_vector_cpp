@@ -72,6 +72,18 @@ bool testInsert()
   return true;
 }
 
+bool testErase()
+{
+  stuff::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+
+  v.erase(1);
+  ASSERT_TRUE(v[1] == 3);
+  return true;
+}
+
 template < typename F > void run_test(const char* name, F test)
 {
   try {
@@ -89,12 +101,9 @@ template < typename F > void run_test(const char* name, F test)
 int main()
 {
   using test_t = std::pair< const char*, bool (*)() >;
-  test_t tests[] = {
-      {"Empty vector", testEmptyVector},
-      {"Push test", testPushBack},
-      {"at() test", testAt},
-      {"Vec[i] test", testBrackets},
-      {"insert() test", testInsert}};
+  test_t tests[] = {{"Empty", testEmptyVector}, {"Push", testPushBack},
+                    {"at()", testAt},           {"Vec[i]", testBrackets},
+                    {"insert()", testInsert},   {"erase()", testErase}};
 
   const size_t count = sizeof(tests) / sizeof(test_t);
 

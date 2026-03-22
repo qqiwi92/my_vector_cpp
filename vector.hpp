@@ -126,4 +126,20 @@ template < class T > void stuff::Vector< T >::insert(size_t index, const T& val)
   size_++;
 }
 
+template < class T > void stuff::Vector< T >::erase(size_t index)
+{
+  if (index >= size_) {
+    throw std::out_of_range(
+        "Wrong place to insert (maybe i'm gonna add something interesting like "
+        "adding it to the end in this case or just place it the that  position "
+        "and fill the gap with garbage ");
+  }
+
+  data_[size_] = data_[size_ - 1];
+  for (size_t i = size_ - 1; i > index; --i) {
+    data_[i - 1] = data_[i];
+  }
+  size_--;
+}
+
 #endif
