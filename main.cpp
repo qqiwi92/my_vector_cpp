@@ -4,6 +4,9 @@
 #define ANSI_RED "\033[31m"
 #define ANSI_GREEN "\033[32m"
 #define ANSI_RESET "\033[0m"
+#define ASSERT_TRUE(condition)                                                 \
+  if (!(condition))                                                            \
+    return false;
 
 bool testEmptyVector()
 {
@@ -11,18 +14,24 @@ bool testEmptyVector()
   return v.isEmpty();
 }
 
-bool testPushBack() {
-    stuff::Vector<int> v;
-    v.pushBack(1);
-    v.pushBack(2);
-    v.pushBack(3);
-    return v.getSize() == 3;
+bool testPushBack()
+{
+  stuff::Vector< int > v;
+  v.pushBack(1);
+  ASSERT_TRUE(v.getSize() == 1);
+  v.pushBack(2);
+  ASSERT_TRUE(v.getSize() == 2);
+  v.pushBack(3);
+  ASSERT_TRUE(v.getSize() == 3);
+
+  return true;
 }
 
 int main()
 {
   using test_t = std::pair< const char*, bool (*)() >;
-  test_t tests[] = {{"Empty vector", testEmptyVector}, {"Push test", testPushBack}};
+  test_t tests[] = {
+      {"Empty vector", testEmptyVector}, {"Push test", testPushBack}};
   const size_t count = sizeof(tests) / sizeof(test_t);
 
   std::cout << std::boolalpha;
