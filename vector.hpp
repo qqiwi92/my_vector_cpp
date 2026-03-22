@@ -55,7 +55,7 @@ template < class T > void stuff::Vector< T >::expand()
     delete[] data_;
     data_ = nw;
     capacity_ = nw_capacity;
-    
+
   } catch (...) {
     delete[] nw;
   }
@@ -63,4 +63,13 @@ template < class T > void stuff::Vector< T >::expand()
 
 template < class T > void stuff::Vector< T >::pushBack(const T& val) {}
 
+template < class T > size_t stuff::Vector< T >::getSize() const noexcept
+{
+  return size_;
+}
+
+template < class T > size_t stuff::Vector< T >::getCapacity() const noexcept
+{
+  return capacity_;
+}
 #endif
