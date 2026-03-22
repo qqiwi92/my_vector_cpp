@@ -11,10 +11,18 @@ bool testEmptyVector()
   return v.isEmpty();
 }
 
+bool testPushBack() {
+    stuff::Vector<int> v;
+    v.pushBack(1);
+    v.pushBack(2);
+    v.pushBack(3);
+    return v.getSize() == 3;
+}
+
 int main()
 {
   using test_t = std::pair< const char*, bool (*)() >;
-  test_t tests[] = {{"Empty vector", testEmptyVector}};
+  test_t tests[] = {{"Empty vector", testEmptyVector}, {"Push test", testPushBack}};
   const size_t count = sizeof(tests) / sizeof(test_t);
 
   std::cout << std::boolalpha;
