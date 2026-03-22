@@ -2,7 +2,7 @@
 #define CUSTOM_VECTOR
 
 #include <cstddef>
-
+#include <stdexcept>
 namespace stuff {
 
   template < class T > struct Vector {
@@ -12,6 +12,7 @@ namespace stuff {
     Vector(Vector&&);
     Vector& operator=(const Vector&);
     Vector& operator=(Vector&&);
+    T& operator[](const Vector &);
 
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
@@ -21,9 +22,11 @@ namespace stuff {
     void popBack();
     void insert(size_t i, const T& v);
     void erase(size_t i);
+    T& at(size_t index);
 
-  private:
-    void expand();
+
+        private : void
+                  expand();
     void expandIfFull();
     T* data_;
     size_t size_, capacity_;
@@ -36,6 +39,14 @@ template < class T > stuff::Vector< T >::~Vector() { delete[] data_; }
 template < class T >
 stuff::Vector< T >::Vector() : data_(nullptr), size_(0), capacity_(0)
 {
+}
+
+template < class T > T& stuff::Vector< T >::at(size_t index)
+{
+  if (index < size_) {
+    return data_[index];
+  }
+  throw std::out_of_range("index out of bounds");
 }
 
 template < class T > bool stuff::Vector< T >::isEmpty() const noexcept

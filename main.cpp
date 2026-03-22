@@ -27,11 +27,34 @@ bool testPushBack()
   return true;
 }
 
+bool testAt()
+{
+  stuff::Vector< int > v;
+  v.pushBack(1);
+  ASSERT_TRUE(v.at(0) == 1);
+  v.pushBack(2);
+  ASSERT_TRUE(v.at(1) == 2);
+  v.pushBack(3);
+  ASSERT_TRUE(v.at(2) == 3);
+  v.at(2) = 4;
+  ASSERT_TRUE(v.at(2) == 4);
+
+  try {
+    v.at(100);
+    return false;
+  } catch (...) {
+    return true;
+  }
+}
+
 int main()
 {
   using test_t = std::pair< const char*, bool (*)() >;
   test_t tests[] = {
-      {"Empty vector", testEmptyVector}, {"Push test", testPushBack}};
+      {"Empty vector", testEmptyVector},
+      {"Push test", testPushBack},
+      {"at() test", testPushBack}};
+
   const size_t count = sizeof(tests) / sizeof(test_t);
 
   std::cout << std::boolalpha;
