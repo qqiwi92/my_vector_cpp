@@ -61,6 +61,20 @@ bool testBrackets()
   return true;
 }
 
+template < typename F > void run_test(const char* name, F test)
+{
+  try {
+    if (test()) {
+      std::cout << ANSI_GREEN << "[PASS] " << name << ANSI_RESET << "\n";
+    } else {
+      std::cout << ANSI_RED << "[FAIL] " << name << ANSI_RESET << "\n";
+    }
+  } catch (const std::exception& e) {
+    std::cout << ANSI_RED << "[CRASH] " << name << " threw: " << e.what()
+              << ANSI_RESET << "\n";
+  }
+}
+
 int main()
 {
   using test_t = std::pair< const char*, bool (*)() >;
@@ -76,15 +90,8 @@ int main()
 
   bool all_pass = true;
   for (size_t i = 0; i < count; ++i) {
-    bool res = tests[i].second();
-
-    if (!res) {
-      std::cout << ANSI_RED << tests[i].first << ": " << res << ANSI_RESET;
-      all_pass = false;
-    } else {
-      std::cout << ANSI_GREEN << tests[i].first << ": " << res << ANSI_RESET;
-    }
-    std::cout << "\n";
+    test_t tst = tests[i];
+    run_test(tst.first, tst.second);
   }
 
   std::cout << "\n";
