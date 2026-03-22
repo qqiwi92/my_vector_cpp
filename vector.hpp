@@ -55,7 +55,7 @@ template < class T > bool stuff::Vector< T >::isEmpty() const noexcept
 
 template < class T > void stuff::Vector< T >::expand()
 {
-  size_t nw_capacity = 3 / 2 * (capacity_ + 1);
+  size_t nw_capacity = capacity_ + (capacity_ >> 1) + 1;
   T* nw = nullptr;
   try {
 
@@ -69,6 +69,7 @@ template < class T > void stuff::Vector< T >::expand()
 
   } catch (...) {
     delete[] nw;
+    throw;
   }
 }
 
@@ -98,6 +99,13 @@ template < class T > size_t stuff::Vector< T >::getSize() const noexcept
 template < class T > size_t stuff::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
+}
+
+template < class T > void stuff::Vector< T >::popBack()
+{
+  if (size_) {
+    size_--;
+  }
 }
 
 #endif

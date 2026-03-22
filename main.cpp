@@ -67,7 +67,7 @@ int main()
   test_t tests[] = {
       {"Empty vector", testEmptyVector},
       {"Push test", testPushBack},
-      {"at() test", testPushBack},
+      {"at() test", testAt},
       {"Vec[i] test", testBrackets}};
 
   const size_t count = sizeof(tests) / sizeof(test_t);
