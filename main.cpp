@@ -61,6 +61,17 @@ bool testBrackets()
   return true;
 }
 
+bool testInsert()
+{
+  stuff::Vector< int > v;
+  v.insert(0, 1);
+  ASSERT_TRUE(v[0] == 1);
+  v.insert(0, 2);
+  ASSERT_TRUE(v[0] == 2);
+
+  return true;
+}
+
 template < typename F > void run_test(const char* name, F test)
 {
   try {
@@ -82,7 +93,8 @@ int main()
       {"Empty vector", testEmptyVector},
       {"Push test", testPushBack},
       {"at() test", testAt},
-      {"Vec[i] test", testBrackets}};
+      {"Vec[i] test", testBrackets},
+      {"insert() test", testInsert}};
 
   const size_t count = sizeof(tests) / sizeof(test_t);
 
