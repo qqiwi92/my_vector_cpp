@@ -72,4 +72,7 @@ template < class T > size_t stuff::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
 }
+
+
+
 #endif
