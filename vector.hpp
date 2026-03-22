@@ -108,4 +108,22 @@ template < class T > void stuff::Vector< T >::popBack()
   }
 }
 
+template < class T > void stuff::Vector< T >::insert(size_t index, const T& val)
+{
+  if (index > size_) {
+    throw std::out_of_range(
+        "Wrong place to insert (maybe i'm gonna add something interesting like "
+        "adding it to the end in this case or just place it the that  position "
+        "and fill the gap with garbage ");
+  }
+
+  expandIfFull();
+  data_[size_] = data_[size_ - 1];
+  for (size_t i = size_; i > index; --i) {
+    data_[i] = data_[i - 1];
+  }
+  data_[index] = val;
+  size_++;
+}
+
 #endif
