@@ -46,20 +46,16 @@ stuff::Vector< T >::Vector() : data_(nullptr), size_(0), capacity_(0)
 {
 }
 
-template < class T > T& stuff::Vector< T >::at(size_t index)
-{
-  if (index < size_) {
-    return data_[index];
-  }
-  throw std::out_of_range("index out of bounds");
-}
-
 template < class T > const T& stuff::Vector< T >::at(size_t index) const
 {
-  if (index < size_) {
-    return data_[index];
-  }
-  throw std::out_of_range("index out of bounds");
+  if (index >= size_)
+    throw std::out_of_range("index out of bounds");
+  return data_[index];
+}
+
+template < class T > T& stuff::Vector< T >::at(size_t index)
+{
+  return const_cast< T& >(static_cast< const Vector< T >& >(*this).at(index));
 }
 
 template < class T > bool stuff::Vector< T >::isEmpty() const noexcept
