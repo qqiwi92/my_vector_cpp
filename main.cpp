@@ -84,6 +84,18 @@ bool testErase()
   return true;
 }
 
+bool testConstElementVector()
+{
+  const stuff::Vector< int > v;
+
+
+  ASSERT_TRUE(v.getSize() == 1);
+  ASSERT_TRUE(v.at(0) == 42);
+  ASSERT_TRUE(v[0] == 42);
+
+  return true;
+}
+
 template < typename F > void run_test(const char* name, F test)
 {
   try {
@@ -101,9 +113,14 @@ template < typename F > void run_test(const char* name, F test)
 int main()
 {
   using test_t = std::pair< const char*, bool (*)() >;
-  test_t tests[] = {{"Empty", testEmptyVector}, {"Push", testPushBack},
-                    {"at()", testAt},           {"Vec[i]", testBrackets},
-                    {"insert()", testInsert},   {"erase()", testErase}};
+  test_t tests[] = {
+      {"Empty", testEmptyVector},
+      {"Push", testPushBack},
+      {"at()", testAt},
+      {"Vec[i]", testBrackets},
+      {"insert()", testInsert},
+      {"erase()", testErase},
+      {"Const Elements", testConstElementVector}};
 
   const size_t count = sizeof(tests) / sizeof(test_t);
 
@@ -116,5 +133,6 @@ int main()
   }
 
   std::cout << "\n";
+
   return all_pass ? 0 : 1;
 }
