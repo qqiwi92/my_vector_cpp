@@ -38,6 +38,21 @@ namespace stuff {
   bool operator==(const stuff::Vector< T >& lhs, const stuff::Vector< T >& rhs);
 }
 
+template < class T >
+bool stuff::operator==(
+    const stuff::Vector< T >& lhs, const stuff::Vector< T >& rhs)
+{
+  bool IsEqual = lhs.getSize() == rhs.getSize();
+
+  for (size_t i = 0;
+       i < lhs.getSize() && (IsEqual = IsEqual && (lhs[i] == rhs[i])); ++i) {
+  }
+  return IsEqual;
+
+  return IsEqual;
+}
+
+
 template < class T > stuff::Vector< T >::~Vector() { delete[] data_; }
 template < class T > void stuff::Vector< T >::swap(Vector< T >& v)
 {
