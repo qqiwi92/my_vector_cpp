@@ -84,14 +84,16 @@ bool testErase()
   return true;
 }
 
-bool testConstElementVector()
+bool testConstContainer()
 {
-  const stuff::Vector< int > v;
+  stuff::Vector< int > v;
+  v.pushBack(42);
 
+  const stuff::Vector< int >& c_v = v;
 
-  ASSERT_TRUE(v.getSize() == 1);
-  ASSERT_TRUE(v.at(0) == 42);
-  ASSERT_TRUE(v[0] == 42);
+  ASSERT_TRUE(c_v.getSize() == 1);
+  ASSERT_TRUE(c_v.at(0) == 42);
+  ASSERT_TRUE(c_v[0] == 42);
 
   return true;
 }
@@ -120,7 +122,7 @@ int main()
       {"Vec[i]", testBrackets},
       {"insert()", testInsert},
       {"erase()", testErase},
-      {"Const Elements", testConstElementVector}};
+      {"Const Elements", testConstContainer}};
 
   const size_t count = sizeof(tests) / sizeof(test_t);
 
