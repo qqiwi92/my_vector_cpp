@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <stdexcept>
 namespace stuff {
-
   template < class T > struct Vector {
     ~Vector();
     Vector();
@@ -12,7 +11,9 @@ namespace stuff {
     Vector(Vector&&);
     Vector& operator=(const Vector&);
     Vector& operator=(Vector&&);
-    T& operator[](size_t);
+
+    T& operator[](size_t) noexcept;
+    const T& operator[](size_t) const noexcept;
 
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
@@ -23,17 +24,22 @@ namespace stuff {
     void insert(size_t i, const T& v);
     void erase(size_t i);
     T& at(size_t index);
+    const T& at(size_t index) const;
 
   private:
+    void swap(Vector< T >&);
     void expand();
     void expandIfFull();
     T* data_;
     size_t size_, capacity_;
   };
-
 }
 
 template < class T > stuff::Vector< T >::~Vector() { delete[] data_; }
+template < class T > void stuff::Vector< T >::swap(Vector< T >& v)
+{
+  std::swap(data_, v.data_);
+}
 
 template < class T >
 stuff::Vector< T >::Vector() : data_(nullptr), size_(0), capacity_(0)
@@ -41,6 +47,14 @@ stuff::Vector< T >::Vector() : data_(nullptr), size_(0), capacity_(0)
 }
 
 template < class T > T& stuff::Vector< T >::at(size_t index)
+{
+  if (index < size_) {
+    return data_[index];
+  }
+  throw std::out_of_range("index out of bounds");
+}
+
+template < class T > const T& stuff::Vector< T >::at(size_t index) const
 {
   if (index < size_) {
     return data_[index];
@@ -80,7 +94,13 @@ template < class T > void stuff::Vector< T >::expandIfFull()
   }
 }
 
-template < class T > T& stuff::Vector< T >::operator[](size_t i)
+template < class T > T& stuff::Vector< T >::operator[](size_t i) noexcept
+{
+  return data_[i];
+}
+
+template < class T >
+const T& stuff::Vector< T >::operator[](size_t i) const noexcept
 {
   return data_[i];
 }
