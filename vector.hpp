@@ -8,10 +8,9 @@ namespace stuff {
     ~Vector();
     Vector();
     Vector(const Vector&);
-    Vector(Vector&&);
+    Vector(Vector< T >&& rhs) noexcept;
     Vector& operator=(const Vector&);
-    Vector& operator=(Vector&&);
-
+    Vector& operator=(Vector< T >&& rhs) noexcept;
     T& operator[](size_t) noexcept;
     const T& operator[](size_t) const noexcept;
 
@@ -27,7 +26,8 @@ namespace stuff {
     const T& at(size_t index) const;
 
   private:
-    void swap(Vector< T >&);
+    explicit Vector(size_t);
+    void swap(Vector< T >&) noexcept;
     void expand();
     void expandIfFull();
     T* data_;
@@ -36,6 +36,14 @@ namespace stuff {
 
   template < class T >
   bool operator==(const stuff::Vector< T >& lhs, const stuff::Vector< T >& rhs);
+}
+
+template < class T >
+stuff::Vector< T >& stuff::Vector< T >::operator=(const Vector< T >& rhs)
+{
+  Vector< T > cpy = rhs;
+  swap(cpy);
+  return *this;
 }
 
 template < class T >
@@ -73,9 +81,12 @@ stuff::Vector< T >::Vector(const Vector< T >& rhs)
 }
 
 template < class T > stuff::Vector< T >::~Vector() { delete[] data_; }
-template < class T > void stuff::Vector< T >::swap(Vector< T >& v)
+
+template < class T > void stuff::Vector< T >::swap(Vector< T >& rhs) noexcept
 {
-  std::swap(data_, v.data_);
+  std::swap(data_, rhs.data_);
+  std::swap(size_, rhs.size_);
+  std::swap(capacity_, rhs.capacity_);
 }
 
 template < class T >
@@ -179,18 +190,28 @@ template < class T > void stuff::Vector< T >::insert(size_t index, const T& val)
   size_++;
 }
 
+template < class T >
+stuff::Vector< T >::Vector(Vector< T >&& rhs) noexcept
+    : data_(nullptr), size_(0), capacity_(0)
+{
+  swap(rhs);
+}
+
+template < class T >
+stuff::Vector< T >& stuff::Vector< T >::operator=(Vector< T >&& rhs) noexcept
+{
+  swap(rhs);
+  return *this;
+}
+
 template < class T > void stuff::Vector< T >::erase(size_t index)
 {
   if (index >= size_) {
-    throw std::out_of_range(
-        "Wrong place to insert (maybe i'm gonna add something interesting like "
-        "adding it to the end in this case or just place it the that  position "
-        "and fill the gap with garbage ");
+    throw std::out_of_range("index oout of bounds for erase");
   }
 
-  data_[size_] = data_[size_ - 1];
-  for (size_t i = size_ - 1; i > index; --i) {
-    data_[i - 1] = data_[i];
+  for (size_t i = index; i < size_ - 1; ++i) {
+    data_[i] = data_[i + 1];
   }
   size_--;
 }
