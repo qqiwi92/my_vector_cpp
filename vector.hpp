@@ -33,6 +33,9 @@ namespace stuff {
     T* data_;
     size_t size_, capacity_;
   };
+
+  template < class T >
+  bool operator==(const stuff::Vector< T >& lhs, const stuff::Vector< T >& rhs);
 }
 
 template < class T > stuff::Vector< T >::~Vector() { delete[] data_; }

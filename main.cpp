@@ -98,6 +98,12 @@ bool testConstContainer()
   return true;
 }
 
+bool testCopyConstructor() {
+    stuff::Vector<int> v ;
+    stuff::Vector<int> yav = v;
+    return v == yav;
+}
+
 template < typename F > void run_test(const char* name, F test)
 {
   try {
@@ -122,7 +128,9 @@ int main()
       {"Vec[i]", testBrackets},
       {"insert()", testInsert},
       {"erase()", testErase},
-      {"Const Elements", testConstContainer}};
+      {"Const Elements", testConstContainer},
+      {"copy constructor", testCopyConstructor}
+  };
 
   const size_t count = sizeof(tests) / sizeof(test_t);
 
