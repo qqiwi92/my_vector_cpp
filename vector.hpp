@@ -52,6 +52,25 @@ bool stuff::operator==(
   return IsEqual;
 }
 
+template < class T >
+stuff::Vector< T >::Vector(const Vector< T >& rhs)
+    : data_(nullptr), size_(rhs.size_), capacity_(rhs.size_)
+{
+  if (capacity_ > 0) {
+    data_ = new T[capacity_];
+    for (size_t i = 0; i < size_; ++i) {
+      try {
+        data_[i] = rhs.data_[i];
+      } catch (...) {
+        delete[] data_;
+        data_ = nullptr;
+        size_ = 0;
+        capacity_ = 0;
+        throw;
+      }
+    }
+  }
+}
 
 template < class T > stuff::Vector< T >::~Vector() { delete[] data_; }
 template < class T > void stuff::Vector< T >::swap(Vector< T >& v)
