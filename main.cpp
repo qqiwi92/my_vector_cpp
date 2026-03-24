@@ -98,10 +98,21 @@ bool testConstContainer()
   return true;
 }
 
-bool testCopyConstructor() {
-    stuff::Vector<int> v ;
-    stuff::Vector<int> yav = v;
-    return v == yav;
+bool testCopyConstructor()
+{
+  stuff::Vector< int > v;
+  stuff::Vector< int > yav = v;
+  return v == yav;
+}
+
+bool testCopyConstrucotorForNonEmpty()
+{
+  stuff::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  stuff::Vector< int > yav = v;
+  return v == yav;
 }
 
 template < typename F > void run_test(const char* name, F test)
@@ -118,9 +129,26 @@ template < typename F > void run_test(const char* name, F test)
   }
 }
 
+using test_t = std::pair< const char*, bool (*)() >;
+
+template < size_t Len > bool run_tests(test_t (&in)[Len])
+{
+  const size_t count = sizeof(in) / sizeof(test_t);
+
+  std::cout << std::boolalpha;
+
+  bool all_pass = true;
+  for (size_t i = 0; i < count; ++i) {
+    test_t tst = in[i];
+    run_test(tst.first, tst.second);
+  }
+
+  std::cout << "\n";
+  return all_pass;
+}
+
 int main()
 {
-  using test_t = std::pair< const char*, bool (*)() >;
   test_t tests[] = {
       {"Empty", testEmptyVector},
       {"Push", testPushBack},
@@ -129,20 +157,11 @@ int main()
       {"insert()", testInsert},
       {"erase()", testErase},
       {"Const Elements", testConstContainer},
-      {"copy constructor", testCopyConstructor}
+      {"copy constructor", testCopyConstructor},
+      {"copy constructor non empty", testCopyConstrucotorForNonEmpty},
   };
 
-  const size_t count = sizeof(tests) / sizeof(test_t);
+  bool success = run_tests(tests);
 
-  std::cout << std::boolalpha;
-
-  bool all_pass = true;
-  for (size_t i = 0; i < count; ++i) {
-    test_t tst = tests[i];
-    run_test(tst.first, tst.second);
-  }
-
-  std::cout << "\n";
-
-  return all_pass ? 0 : 1;
+  return success ? 0 : 1;
 }
