@@ -6,4 +6,8 @@ main: main.o
 -include main.d
 
 clean:
-	rm -rf *.o *.d main
+	@$(RM) *.o *.d main
+
+run:
+	@make main > /dev/null 2>&1
+	./main
