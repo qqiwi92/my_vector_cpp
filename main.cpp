@@ -115,6 +115,15 @@ bool testCopyConstrucotorForNonEmpty()
   return v == yav;
 }
 
+bool testInitializerConstructor()
+{
+  stuff::Vector< int > v{1, 2, 3};
+  ASSERT_TRUE(v[0] == 1);
+  ASSERT_TRUE(v[1] == 2);
+  ASSERT_TRUE(v[2] == 3)
+  return true;
+}
+
 template < typename F > void run_test(const char* name, F test)
 {
   try {
@@ -159,7 +168,7 @@ int main()
       {"Const Elements", testConstContainer},
       {"copy constructor", testCopyConstructor},
       {"copy constructor non empty", testCopyConstrucotorForNonEmpty},
-  };
+      {"initializer constructor", testInitializerConstructor}};
 
   bool success = run_tests(tests);
 
