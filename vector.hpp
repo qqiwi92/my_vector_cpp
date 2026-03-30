@@ -2,6 +2,7 @@
 #define CUSTOM_VECTOR
 
 #include <cstddef>
+#include <initializer_list>
 #include <stdexcept>
 namespace stuff {
   template < class T > struct Vector {
@@ -9,6 +10,7 @@ namespace stuff {
     Vector();
     Vector(const Vector&);
     Vector(Vector< T >&& rhs) noexcept;
+    Vector(std::initializer_list< T > il);
     Vector& operator=(const Vector&);
     Vector& operator=(Vector< T >&& rhs) noexcept;
     T& operator[](size_t) noexcept;
@@ -38,6 +40,20 @@ namespace stuff {
   bool operator==(const stuff::Vector< T >& lhs, const stuff::Vector< T >& rhs);
 }
 
+template < class T >
+stuff::Vector< T >::Vector(std::initializer_list< T > il) : Vector(il.size())
+{
+  size_t i = 0;
+  for (auto it = il.begin(); it != il.end(); ++it) {
+    data_[i++] = *it;
+  }
+}
+
+template < class T >
+stuff::Vector< T >::Vector(size_t cap)
+    : data_(new T[cap]), size_(cap), capacity_(cap)
+{
+}
 template < class T >
 stuff::Vector< T >& stuff::Vector< T >::operator=(const Vector< T >& rhs)
 {
@@ -182,7 +198,6 @@ template < class T > void stuff::Vector< T >::insert(size_t index, const T& val)
   }
 
   expandIfFull();
-  data_[size_] = data_[size_ - 1];
   for (size_t i = size_; i > index; --i) {
     data_[i] = data_[i - 1];
   }
