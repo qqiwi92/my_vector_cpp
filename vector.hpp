@@ -10,7 +10,7 @@ namespace stuff {
     Vector();
     Vector(const Vector&);
     Vector(Vector< T >&& rhs) noexcept;
-    Vector(std::initializer_list< T > il);
+    explicit Vector(std::initializer_list< T > il);
     Vector& operator=(const Vector&);
     Vector& operator=(Vector< T >&& rhs) noexcept;
     T& operator[](size_t) noexcept;
@@ -26,18 +26,70 @@ namespace stuff {
     void erase(size_t i);
     T& at(size_t index);
     const T& at(size_t index) const;
+    void pushBackCount(size_t k, const T& val);
+    void reserve(size_t);
+    void shrinkToFit();
+    template < class IT > void pushBackRange(IT b, size_t c);
 
   private:
     explicit Vector(size_t);
     void swap(Vector< T >&) noexcept;
     void expand();
     void expandIfFull();
+    void unsafePushBack();
     T* data_;
     size_t size_, capacity_;
   };
 
   template < class T >
   bool operator==(const stuff::Vector< T >& lhs, const stuff::Vector< T >& rhs);
+}
+
+template < class T >
+template < class IT >
+void stuff::Vector< T >::pushBackRange(IT b, size_t c)
+{
+  if (size_ + c > capacity_) {
+    reserve(size_ + c);
+  }
+  for (size_t i = 0; i < c; ++i) {
+    data_[size_++] = *b;
+    ++b;
+  }
+}
+
+template <class T>
+void stuff::Vector<T> ::reserve(size_t new_cap) {
+    if (new_cap < size_) return;
+    T * nw = new T[new_cap];
+    
+    try { 
+        for (size_t i =0; i < size_; ++i) {
+            nw[i] = data_[i];
+        }
+    } catch (...) {
+        delete [] nw;
+        throw;
+    }
+    delete[] data_;
+    data_ = nw;
+    capacity_ = new_cap;
+}
+
+template <class T> 
+void stuff:: Vector<T>::shrinkToFit() {
+    reserve(size_);
+}
+
+template < class T >
+void stuff::Vector< T >::pushBackCount(size_t k, const T& val)
+{
+  if (size_ + k > capacity_) {
+    reserve(size_ + k);
+  }
+  for (size_t i = 0; i < k; ++i) {
+    data_[size_++] = val;
+  }
 }
 
 template < class T >
@@ -51,7 +103,7 @@ stuff::Vector< T >::Vector(std::initializer_list< T > il) : Vector(il.size())
 
 template < class T >
 stuff::Vector< T >::Vector(size_t cap)
-    : data_(new T[cap]), size_(cap), capacity_(cap)
+    : data_(new T[cap]), size_(0), capacity_(cap)
 {
 }
 template < class T >
