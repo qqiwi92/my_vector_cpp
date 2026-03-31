@@ -124,6 +124,55 @@ bool testInitializerConstructor()
   return true;
 }
 
+bool testPushBackCount()
+{
+  stuff::Vector< int > v;
+  v.pushBackCount(3, 64);
+  ASSERT_TRUE(v[0] == 64);
+  ASSERT_TRUE(v[1] == 64);
+  ASSERT_TRUE(v[2] == 64)
+  return true;
+}
+
+bool testPushBackRange()
+{
+  int data[] = {10, 20, 30, 40};
+  stuff::Vector< int > v;
+  v.pushBackRange(data, 4);
+
+  ASSERT_TRUE(v.getSize() == 4);
+
+  bool match = (v[0] == 10 && v[1] == 20 && v[2] == 30 && v[3] == 40);
+  ASSERT_TRUE(match);
+  return true;
+}
+
+bool testReserve()
+{
+  stuff::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+
+  size_t oldSize = v.getSize();
+  v.reserve(100);
+
+  ASSERT_TRUE(v.getSize() == oldSize);
+  ASSERT_TRUE(v.getCapacity() >= 100);
+  ASSERT_TRUE(v[0] == 1 && v[1] == 2);
+  return true;
+}
+
+bool testShrinkToFit()
+{
+  stuff::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.reserve(100);
+
+  v.shrinkToFit();
+  return v.getCapacity() == v.getSize();
+}
+
 template < typename F > void run_test(const char* name, F test)
 {
   try {
@@ -168,7 +217,11 @@ int main()
       {"Const Elements", testConstContainer},
       {"copy constructor", testCopyConstructor},
       {"copy constructor non empty", testCopyConstrucotorForNonEmpty},
-      {"initializer constructor", testInitializerConstructor}};
+      {"initializer constructor", testInitializerConstructor},
+      {"pushBackCount", testPushBackCount},
+      {"pushBackRange", testPushBackRange},
+      {"reserve", testReserve},
+      {"shrinkToFit", testShrinkToFit}};
 
   bool success = run_tests(tests);
 
