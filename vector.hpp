@@ -5,6 +5,92 @@
 #include <initializer_list>
 #include <stdexcept>
 namespace stuff {
+  template < class T > class VIter
+  {
+  public:
+    T* curr;
+    VIter< T >(T* ptr) : curr(ptr) {}
+    T& operator*() { return *(curr); }
+    VIter& operator++()
+    {
+      curr++;
+      return *this;
+    }
+
+    VIter operator++(int)
+    {
+      VIter temp = *this;
+      ++(*this);
+      return temp;
+    }
+
+    VIter& operator--()
+    {
+      --curr;
+      return *this;
+    }
+
+    VIter operator--(int)
+    {
+      VIter temp = *this;
+      --(*this);
+      return temp;
+    }
+    bool operator==(const VIter& other) const { return curr == other.curr; }
+    bool operator!=(const VIter& other) const { return !(*this == other); }
+
+    bool operator==(const VCIter< T >& other) const
+    {
+      return curr == other.curr;
+    }
+    bool operator!=(const VCIter< T >& other) const
+    {
+      return curr != other.curr;
+    }
+  };
+  template < class T > class VCIter
+  {
+  public:
+    T* curr;
+    VCIter< T >(T* ptr) : curr(ptr) {}
+    T& operator*() { return *(curr); }
+    VCIter& operator++()
+    {
+      curr++;
+      return *this;
+    }
+
+    VCIter operator++(int)
+    {
+      VCIter temp = *this;
+      ++(*this);
+      return temp;
+    }
+
+    VCIter& operator--()
+    {
+      --curr;
+      return *this;
+    }
+
+    VCIter operator--(int)
+    {
+      VCIter temp = *this;
+      --(*this);
+      return temp;
+    }
+    bool operator==(const VCIter& other) const { return curr == other.curr; }
+    bool operator!=(const VCIter& other) const { return !(*this == other); }
+
+    bool operator==(const VIter< T >& other) const
+    {
+      return curr == other.curr;
+    }
+    bool operator!=(const VIter< T >& other) const
+    {
+      return curr != other.curr;
+    }
+  };
   template < class T > struct Vector {
     ~Vector();
     Vector();
@@ -30,6 +116,10 @@ namespace stuff {
     void reserve(size_t);
     void shrinkToFit();
     template < class IT > void pushBackRange(IT b, size_t c);
+    VIter< T > begin();
+    VCIter< T > cbegin();
+    VIter< T > end();
+    VCIter< T > cend();
 
   private:
     explicit Vector(size_t);
@@ -43,6 +133,27 @@ namespace stuff {
 
   template < class T >
   bool operator==(const stuff::Vector< T >& lhs, const stuff::Vector< T >& rhs);
+
+  template < class T > VIter< T > Vector< T >::begin()
+  {
+    return VIter< T >(data_);
+  }
+
+  template < class T > VIter< T > Vector< T >::end()
+  {
+    return VIter< T >(data_ + size_);
+  }
+
+  template < class T > VСIter< T > Vector< T >::сbegin()
+  {
+    return VСIter< T >(data_);
+  }
+
+  template < class T > VСIter< T > Vector< T >::сend()
+  {
+    return VСIter< T >(data_ + size_);
+  }
+
 }
 
 template < class T >
