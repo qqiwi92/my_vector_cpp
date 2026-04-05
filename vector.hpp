@@ -58,28 +58,26 @@ void stuff::Vector< T >::pushBackRange(IT b, size_t c)
   }
 }
 
-template <class T>
-void stuff::Vector<T> ::reserve(size_t new_cap) {
-    if (new_cap < size_) return;
-    T * nw = new T[new_cap];
-    
-    try { 
-        for (size_t i =0; i < size_; ++i) {
-            nw[i] = data_[i];
-        }
-    } catch (...) {
-        delete [] nw;
-        throw;
+template < class T > void stuff::Vector< T >::reserve(size_t new_cap)
+{
+  if (new_cap < size_)
+    return;
+  T* nw = new T[new_cap];
+
+  try {
+    for (size_t i = 0; i < size_; ++i) {
+      nw[i] = data_[i];
     }
-    delete[] data_;
-    data_ = nw;
-    capacity_ = new_cap;
+  } catch (...) {
+    delete[] nw;
+    throw;
+  }
+  delete[] data_;
+  data_ = nw;
+  capacity_ = new_cap;
 }
 
-template <class T> 
-void stuff:: Vector<T>::shrinkToFit() {
-    reserve(size_);
-}
+template < class T > void stuff::Vector< T >::shrinkToFit() { reserve(size_); }
 
 template < class T >
 void stuff::Vector< T >::pushBackCount(size_t k, const T& val)
