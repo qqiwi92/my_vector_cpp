@@ -1,10 +1,13 @@
 #ifndef CUSTOM_VECTOR
 #define CUSTOM_VECTOR
 
+#include <algorithm>
 #include <cstddef>
 #include <initializer_list>
 #include <stdexcept>
 namespace stuff {
+
+  template < typename T > class VCIter;
   template < class T > class VIter
   {
   public:
@@ -55,7 +58,7 @@ namespace stuff {
   public:
     T* curr;
     VCIter< T >(T* ptr) : curr(ptr) {}
-    T& operator*() { return *(curr); }
+    const T& operator*() { return *(curr); }
     VCIter& operator++()
     {
       curr++;
@@ -92,6 +95,8 @@ namespace stuff {
     {
       return curr != other.curr;
     }
+    VCIter operator+(size_t n) const { return VCIter(curr + n); }
+    VCIter operator-(size_t n) const { return VCIter(curr - n); }
   };
   template < class T > struct Vector {
     ~Vector();
@@ -111,7 +116,11 @@ namespace stuff {
     void pushBack(const T& v);
     void popBack();
     void insert(size_t i, const T& v);
+    void insertBefore(VIter< T > it, const T&& v);
+
     void erase(size_t i);
+    void erase(VIter< T > it);
+    void erase(VIter< T > from, VIter< T > till);
     T& at(size_t index);
     const T& at(size_t index) const;
     void pushBackCount(size_t k, const T& val);
@@ -146,14 +155,14 @@ namespace stuff {
     return VIter< T >(data_ + size_);
   }
 
-  template < class T > VСIter< T > Vector< T >::сbegin()
+  template < class T > VCIter< T > Vector< T >::cbegin()
   {
-    return VСIter< T >(data_);
+    return VCIter< T >(data_);
   }
 
-  template < class T > VСIter< T > Vector< T >::сend()
+  template < class T > VCIter< T > Vector< T >::cend()
   {
-    return VСIter< T >(data_ + size_);
+    return VCIter< T >(data_ + size_);
   }
 
 }
@@ -206,9 +215,8 @@ void stuff::Vector< T >::pushBackCount(size_t k, const T& val)
 template < class T >
 stuff::Vector< T >::Vector(std::initializer_list< T > il) : Vector(il.size())
 {
-  size_t i = 0;
   for (auto it = il.begin(); it != il.end(); ++it) {
-    data_[i++] = *it;
+    data_[size_++] = *it;
   }
 }
 
@@ -234,8 +242,6 @@ bool stuff::operator==(
   for (size_t i = 0;
        i < lhs.getSize() && (IsEqual = IsEqual && (lhs[i] == rhs[i])); ++i) {
   }
-  return IsEqual;
-
   return IsEqual;
 }
 
@@ -298,7 +304,7 @@ template < class T > void stuff::Vector< T >::expand()
 
     nw = new T[nw_capacity];
     for (size_t i = 0; i < size_; ++i) {
-      nw[i] = data_[i];
+      nw[i] = std::move(data_[i]);
     }
     delete[] data_;
     data_ = nw;
@@ -378,6 +384,8 @@ stuff::Vector< T >::Vector(Vector< T >&& rhs) noexcept
 template < class T >
 stuff::Vector< T >& stuff::Vector< T >::operator=(Vector< T >&& rhs) noexcept
 {
+  if (this == &rhs)
+    return *this;
   swap(rhs);
   return *this;
 }
@@ -394,4 +402,28 @@ template < class T > void stuff::Vector< T >::erase(size_t index)
   size_--;
 }
 
+template < class T > void stuff::Vector< T >::erase(stuff::VIter< T > it)
+{
+  erase(it.curr - data_);
+}
+template < class T >
+void stuff::Vector< T >::erase(stuff::VIter< T > from, stuff::VIter< T > till)
+{
+  if (from == till)
+    return;
+
+  size_t start = from.curr - data_;
+  size_t span = till.curr - from.curr;
+  size_t end = start + span;
+
+  for (size_t i = end; i < size_; ++i) {
+    data_[i - span] = std::move(data_[i]);
+  }
+
+  size_ -= span;
+
+  // for (size_t i = 0; i < num_to_remove; ++i) {
+  //     data_[size_ + i].~T();
+  // }
+}
 #endif
