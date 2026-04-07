@@ -39,7 +39,7 @@ namespace stuff {
     bool operator==(const VIter& other) const { return curr == other.curr; }
     bool operator!=(const VIter& other) const { return !(*this == other); }
 
-    bool operator==(const VCIter< T >& other) const
+    bool operator==(const stuff::VCIter< T >& other) const
     {
       return curr == other.curr;
     }
@@ -47,6 +47,8 @@ namespace stuff {
     {
       return curr != other.curr;
     }
+    VIter operator+(size_t n) const { return VIter(curr + n); }
+    VIter operator-(size_t n) const { return VIter(curr - n); }
   };
   template < class T > class VCIter
   {
