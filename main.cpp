@@ -173,6 +173,13 @@ bool testShrinkToFit()
   return v.getCapacity() == v.getSize();
 }
 
+bool testEraseRange()
+{
+  stuff::Vector< int > v = {1, 2, 3, 4, 5};
+  v.erase(v.begin() + 1, v.begin() + 3);
+  return v.getSize() == 3 && v[0] == 1 && v[1] == 4 && v[2] == 5;
+}
+
 template < typename F > void run_test(const char* name, F test)
 {
   try {
@@ -221,7 +228,9 @@ int main()
       {"pushBackCount", testPushBackCount},
       {"pushBackRange", testPushBackRange},
       {"reserve", testReserve},
-      {"shrinkToFit", testShrinkToFit}};
+      {"shrinkToFit", testShrinkToFit},
+      {"EraseRange", testEraseRange},
+  };
 
   bool success = run_tests(tests);
 
