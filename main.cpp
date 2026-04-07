@@ -175,11 +175,15 @@ bool testShrinkToFit()
 
 bool testEraseRange()
 {
-  stuff::Vector< int > v = {1, 2, 3, 4, 5};
-  v.erase(v.begin() + 1, v.begin() + 3);
-  return v.getSize() == 3 && v[0] == 1 && v[1] == 4 && v[2] == 5;
+  auto v = stuff::Vector< int >({1, 2, 3, 4, 5});
+  v.erase(v.begin() + 1, v.begin() + 3); 
+  
+  ASSERT_TRUE(v.getSize() == 3);
+  ASSERT_TRUE(v[0] == 1);
+  ASSERT_TRUE(v[1] == 4);
+  ASSERT_TRUE(v[2] == 5);
+  return true;
 }
-
 template < typename F > void run_test(const char* name, F test)
 {
   try {
