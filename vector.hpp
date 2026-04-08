@@ -6,7 +6,8 @@
 #include <initializer_list>
 #include <stdexcept>
 namespace stuff {
-
+  template < class T > T* newc(size_t);
+  template < class T > void delc(T*, size_t);
   template < typename T > class VCIter;
   template < class T > class VIter
   {
@@ -125,6 +126,8 @@ namespace stuff {
     const T& at(size_t index) const;
     void pushBackCount(size_t k, const T& val);
     void reserve(size_t);
+    void reserve_unsafe(size_t new_cap);
+
     void shrinkToFit();
     template < class IT > void pushBackRange(IT b, size_t c);
     VIter< T > begin();
@@ -184,17 +187,24 @@ template < class T > void stuff::Vector< T >::reserve(size_t new_cap)
 {
   if (new_cap < size_)
     return;
-  T* nw = new T[new_cap];
+  reserve_unsafe(new_cap);
+}
 
+template < class T > void stuff::Vector< T >::reserve_unsafe(size_t new_cap)
+{
+  T* nw = newc< T >(new_cap);
+
+  size_t progress = 0;
+  size_t till = std::min(size_, new_cap);
   try {
-    for (size_t i = 0; i < size_; ++i) {
-      nw[i] = data_[i];
+    for (; progress < till; ++progress) {
+      nw[progress] = data_[progress];
     }
   } catch (...) {
-    delete[] nw;
+    delc(nw, progress);
     throw;
   }
-  delete[] data_;
+  delc(data_);
   data_ = nw;
   capacity_ = new_cap;
 }
@@ -222,7 +232,7 @@ stuff::Vector< T >::Vector(std::initializer_list< T > il) : Vector(il.size())
 
 template < class T >
 stuff::Vector< T >::Vector(size_t cap)
-    : data_(new T[cap]), size_(0), capacity_(cap)
+    : data_(newc< T >(cap)), size_(0), capacity_(cap)
 {
 }
 template < class T >
@@ -250,12 +260,12 @@ stuff::Vector< T >::Vector(const Vector< T >& rhs)
     : data_(nullptr), size_(rhs.size_), capacity_(rhs.size_)
 {
   if (capacity_ > 0) {
-    data_ = new T[capacity_];
+    data_ = newc< T >(capacity_);
     for (size_t i = 0; i < size_; ++i) {
       try {
         data_[i] = rhs.data_[i];
       } catch (...) {
-        delete[] data_;
+        delc(data_, i);
         data_ = nullptr;
         size_ = 0;
         capacity_ = 0;
@@ -265,7 +275,7 @@ stuff::Vector< T >::Vector(const Vector< T >& rhs)
   }
 }
 
-template < class T > stuff::Vector< T >::~Vector() { delete[] data_; }
+template < class T > stuff::Vector< T >::~Vector() { delc(data_, size_); }
 
 template < class T > void stuff::Vector< T >::swap(Vector< T >& rhs) noexcept
 {
@@ -300,18 +310,22 @@ template < class T > void stuff::Vector< T >::expand()
 {
   size_t nw_capacity = capacity_ + (capacity_ >> 1) + 1;
   T* nw = nullptr;
+  size_t creationProgress = 0;
   try {
 
-    nw = new T[nw_capacity];
+    nw = newc< T >(nw_capacity);
     for (size_t i = 0; i < size_; ++i) {
-      nw[i] = std::move(data_[i]);
+      new (&nw[i]) T(std::move(data_[i]));
+      creationProgress++;
     }
-    delete[] data_;
+
+    delc(data_, size_);
+
     data_ = nw;
     capacity_ = nw_capacity;
 
   } catch (...) {
-    delete[] nw;
+    delc(nw, creationProgress);
     throw;
   }
 }
@@ -422,8 +436,20 @@ void stuff::Vector< T >::erase(stuff::VIter< T > from, stuff::VIter< T > till)
 
   size_ -= span;
 
-  // for (size_t i = 0; i < num_to_remove; ++i) {
-  //     data_[size_ + i].~T();
-  // }
+  reserve_unsafe(size_);
 }
+
+template < class T > T* stuff::newc(size_t size)
+{
+  return static_cast< T* >(::operator new(sizeof(T) * size));
+}
+
+template < class T > void stuff::delc(T* ptr, size_t len)
+{
+  for (size_t i = 0; i < len; ++i) {
+    ptr[i].~T();
+  }
+  ::operator delete(ptr);
+}
+
 #endif
