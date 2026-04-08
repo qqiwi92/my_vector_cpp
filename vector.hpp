@@ -6,8 +6,10 @@
 #include <initializer_list>
 #include <stdexcept>
 namespace stuff {
-  template < class T > T* newc(size_t);
-  template < class T > void delc(T*, size_t);
+  template < class T > inline T* newc(size_t);
+  template < class T > inline void delc(T*, size_t);
+  template < class T > inline void destroyRange(T*, size_t);
+
   template < typename T > class VCIter;
   template < class T > class VIter
   {
@@ -126,7 +128,6 @@ namespace stuff {
     const T& at(size_t index) const;
     void pushBackCount(size_t k, const T& val);
     void reserve(size_t);
-    void reserve_unsafe(size_t new_cap);
 
     void shrinkToFit();
     template < class IT > void pushBackRange(IT b, size_t c);
@@ -139,6 +140,7 @@ namespace stuff {
     explicit Vector(size_t);
     void swap(Vector< T >&) noexcept;
     void expand();
+    void reallocate(size_t new_cap);
     void expandIfFull();
     void unsafePushBack();
     T* data_;
@@ -187,10 +189,10 @@ template < class T > void stuff::Vector< T >::reserve(size_t new_cap)
 {
   if (new_cap < size_)
     return;
-  reserve_unsafe(new_cap);
+  reallocate(new_cap);
 }
 
-template < class T > void stuff::Vector< T >::reserve_unsafe(size_t new_cap)
+template < class T > void stuff::Vector< T >::reallocate(size_t new_cap)
 {
   T* nw = newc< T >(new_cap);
 
@@ -204,7 +206,7 @@ template < class T > void stuff::Vector< T >::reserve_unsafe(size_t new_cap)
     delc(nw, progress);
     throw;
   }
-  delc(data_);
+  delc(data_, size_);
   data_ = nw;
   capacity_ = new_cap;
 }
@@ -238,8 +240,8 @@ stuff::Vector< T >::Vector(size_t cap)
 template < class T >
 stuff::Vector< T >& stuff::Vector< T >::operator=(const Vector< T >& rhs)
 {
-  Vector< T > cpy = rhs;
-  swap(cpy);
+  Vector< T > copiedVec = rhs;
+  swap(copiedVec);
   return *this;
 }
 
@@ -436,7 +438,7 @@ void stuff::Vector< T >::erase(stuff::VIter< T > from, stuff::VIter< T > till)
 
   size_ -= span;
 
-  reserve_unsafe(size_);
+  reallocate(size_);
 }
 
 template < class T > T* stuff::newc(size_t size)
@@ -446,10 +448,15 @@ template < class T > T* stuff::newc(size_t size)
 
 template < class T > void stuff::delc(T* ptr, size_t len)
 {
+  destroyRange(ptr, len);
+  ::operator delete(ptr);
+}
+
+template < class T > void stuff::destroyRange(T* ptr, size_t len)
+{
   for (size_t i = 0; i < len; ++i) {
     ptr[i].~T();
   }
-  ::operator delete(ptr);
 }
 
 #endif
