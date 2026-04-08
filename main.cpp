@@ -3,6 +3,7 @@
 
 #define ANSI_RED "\033[31m"
 #define ANSI_GREEN "\033[32m"
+#define ANSI_YELLOW "\033[33m"
 #define ANSI_RESET "\033[0m"
 #define ASSERT_TRUE(condition)                                                 \
   if (!(condition))                                                            \
@@ -242,13 +243,15 @@ bool testStringEdgeCases()
   return true;
 }
 
-template < typename F > void run_test(const char* name, F test)
+template < typename F > bool run_test(const char* name, F test)
 {
   bool verbose = false;
+  bool result = test();
   try {
-    if (test()) {
+    if (result) {
       if (!verbose)
-        return;
+        return true;
+
       std::cout << ANSI_GREEN << "[PASS] " << name << ANSI_RESET << "\n";
     } else {
       std::cout << ANSI_RED << "[FAIL] " << name << ANSI_RESET << "\n";
@@ -257,6 +260,7 @@ template < typename F > void run_test(const char* name, F test)
     std::cout << ANSI_RED << "[CRASH] " << name << " threw: " << e.what()
               << ANSI_RESET << "\n";
   }
+  return result;
 }
 
 using test_t = std::pair< const char*, bool (*)() >;
@@ -267,14 +271,26 @@ template < size_t Len > bool run_tests(test_t (&in)[Len])
 
   std::cout << std::boolalpha;
 
-  bool all_pass = true;
+  size_t successRate = 0;
   for (size_t i = 0; i < count; ++i) {
     test_t tst = in[i];
-    run_test(tst.first, tst.second);
+    bool result = run_test(tst.first, tst.second);
+    successRate += result;
   }
 
   std::cout << "\n";
-  return all_pass;
+
+  if (successRate == count) {
+
+    std::cout << ANSI_YELLOW;
+  } else {
+    std::cout << ANSI_RED;
+  }
+  std::cout << successRate << '/' << count;
+  std::cout << ANSI_RESET << "\n";
+  std::cout << "\n";
+
+  return successRate == count;
 }
 
 int main()
