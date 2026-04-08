@@ -176,18 +176,79 @@ bool testShrinkToFit()
 bool testEraseRange()
 {
   auto v = stuff::Vector< int >({1, 2, 3, 4, 5});
-  v.erase(v.begin() + 1, v.begin() + 3); 
-  
+  v.erase(v.begin() + 1, v.begin() + 3);
+
   ASSERT_TRUE(v.getSize() == 3);
   ASSERT_TRUE(v[0] == 1);
   ASSERT_TRUE(v[1] == 4);
   ASSERT_TRUE(v[2] == 5);
   return true;
 }
+
+#include <string>
+
+bool testStringVector()
+{
+  stuff::Vector< std::string > v;
+  v.pushBack("Hello");
+  v.pushBack("World");
+
+  ASSERT_TRUE(v.getSize() == 2);
+  ASSERT_TRUE(v[0] == "Hello");
+  ASSERT_TRUE(v[1] == "World");
+  return true;
+}
+
+bool testStringDeepCopy()
+{
+  stuff::Vector< std::string > v1;
+  v1.pushBack("Original");
+
+  stuff::Vector< std::string > v2 = v1;
+  v2[0] = "Changed";
+  ASSERT_TRUE(v1[0] == "Original");
+  ASSERT_TRUE(v2[0] == "Changed");
+  return true;
+}
+
+bool testStringReallocation()
+{
+  stuff::Vector< std::string > v;
+  for (int i = 0; i < 50; ++i) {
+    v.pushBack("string_" + std::to_string(i));
+  }
+
+  ASSERT_TRUE(v.getSize() == 50);
+  ASSERT_TRUE(v[49] == "string_49");
+  return true;
+}
+
+bool testStringEdgeCases()
+{
+  stuff::Vector< std::string > v;
+
+  v.pushBack("");
+  ASSERT_TRUE(v[0].empty());
+
+  std::string longStr(1000, 'a');
+  v.pushBack(longStr);
+  ASSERT_TRUE(v[1].length() == 1000);
+
+  v.pushBack("to_be_deleted");
+  v.pushBack("keep_me");
+  v.erase(2);
+
+  ASSERT_TRUE(v[2] == "keep_me");
+  return true;
+}
+
 template < typename F > void run_test(const char* name, F test)
 {
+  bool verbose = false;
   try {
     if (test()) {
+      if (!verbose)
+        return;
       std::cout << ANSI_GREEN << "[PASS] " << name << ANSI_RESET << "\n";
     } else {
       std::cout << ANSI_RED << "[FAIL] " << name << ANSI_RESET << "\n";
@@ -234,7 +295,10 @@ int main()
       {"reserve", testReserve},
       {"shrinkToFit", testShrinkToFit},
       {"EraseRange", testEraseRange},
-  };
+      {"String Basics", testStringVector},
+      {"String Deep Copy", testStringDeepCopy},
+      {"String Reallocation", testStringReallocation},
+      {"String Edge Cases", testStringEdgeCases}};
 
   bool success = run_tests(tests);
 
