@@ -1,9 +1,12 @@
 CXXFLAGS += -Wall -Wextra -std=c++14 -MMD
 
-main: main.o
-	$(CXX) $^ -o $@
+SRCS = main.cpp tests.cpp
+OBJS = $(SRCS:.cpp=.o)
 
--include main.d
+main: $(OBJS)
+	$(CXX) $(OBJS) -o $@
+
+-include $(SRCS:.cpp=.d)
 
 clean:
 	@$(RM) *.o *.d main
