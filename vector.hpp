@@ -4,11 +4,14 @@
 #include <algorithm>
 #include <cstddef>
 #include <initializer_list>
+#include <iostream>
 #include <stdexcept>
 namespace stuff {
   template < class T > inline T* newc(size_t);
   template < class T > inline void delc(T*, size_t);
+  template < class T > inline void destroy(T*);
   template < class T > inline void destroyRange(T*, size_t);
+  template < class T, class... Args > inline void construct(T*, Args&&... args);
 
   template < typename T > class VCIter;
   template < class T > class VIter
@@ -149,7 +152,8 @@ namespace stuff {
 
   template < class T >
   bool operator==(const stuff::Vector< T >& lhs, const stuff::Vector< T >& rhs);
-
+  template < class T >
+  std::ostream& operator<<(std::ostream& os, const Vector< T >& v);
   template < class T > VIter< T > Vector< T >::begin()
   {
     return VIter< T >(data_);
@@ -200,7 +204,7 @@ template < class T > void stuff::Vector< T >::reallocate(size_t new_cap)
   size_t till = std::min(size_, new_cap);
   try {
     for (; progress < till; ++progress) {
-      new (&nw[progress]) T(data_[progress]);
+      stuff::construct< T >(&nw[progress], std::move(data_[progress]));
     }
   } catch (...) {
     delc(nw, progress);
@@ -317,7 +321,7 @@ template < class T > void stuff::Vector< T >::expand()
 
     nw = newc< T >(nw_capacity);
     for (size_t i = 0; i < size_; ++i) {
-      new (&nw[i]) T(std::move(data_[i]));
+      stuff::construct< T >(&nw[i], std::move(data_[i]));
       creationProgress++;
     }
 
@@ -353,7 +357,7 @@ const T& stuff::Vector< T >::operator[](size_t i) const noexcept
 template < class T > void stuff::Vector< T >::pushBack(const T& val)
 {
   expandIfFull();
-  data_[size_++] = val;
+  stuff::construct< T >(&data_[size_++], val);
 }
 
 template < class T > size_t stuff::Vector< T >::getSize() const noexcept
@@ -384,7 +388,7 @@ template < class T > void stuff::Vector< T >::insert(size_t index, const T& val)
 
   expandIfFull();
   for (size_t i = size_; i > index; --i) {
-    data_[i] = data_[i - 1];
+    stuff::construct< T >(&data_[i], data_[i - 1]);
   }
   data_[index] = val;
   size_++;
@@ -455,8 +459,27 @@ template < class T > void stuff::delc(T* ptr, size_t len)
 template < class T > void stuff::destroyRange(T* ptr, size_t len)
 {
   for (size_t i = 0; i < len; ++i) {
-    ptr[i].~T();
+    destroy(&ptr[i]);
   }
+}
+
+template < class T > inline void stuff::destroy(T* ptr) { ptr->~T(); }
+
+template < class T, class... Args >
+inline void stuff::construct(T* place, Args&&... args)
+{
+  new (place) T(std::forward< Args >(args)...);
+}
+
+template < class T >
+std::ostream& stuff::operator<<(std::ostream& os, const Vector< T >& v)
+{
+  os << "[";
+  for (size_t i = 0; i < v.getSize(); ++i) {
+    os << v[i] << (i == v.getSize() - 1 ? "" : ", ");
+  }
+  os << "]";
+  return os;
 }
 
 #endif
