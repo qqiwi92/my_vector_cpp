@@ -200,7 +200,7 @@ template < class T > void stuff::Vector< T >::reallocate(size_t new_cap)
   size_t till = std::min(size_, new_cap);
   try {
     for (; progress < till; ++progress) {
-      nw[progress] = data_[progress];
+      new (&nw[progress]) T(data_[progress]);
     }
   } catch (...) {
     delc(nw, progress);
@@ -438,7 +438,7 @@ void stuff::Vector< T >::erase(stuff::VIter< T > from, stuff::VIter< T > till)
 
   size_ -= span;
 
-  reallocate(size_);
+  destroyRange(data_ + size_, span);
 }
 
 template < class T > T* stuff::newc(size_t size)
